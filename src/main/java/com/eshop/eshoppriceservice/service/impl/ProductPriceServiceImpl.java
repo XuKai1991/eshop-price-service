@@ -4,6 +4,7 @@ import com.alibaba.fastjson.JSONObject;
 import com.eshop.eshoppriceservice.mapper.ProductPriceMapper;
 import com.eshop.eshoppriceservice.model.ProductPrice;
 import com.eshop.eshoppriceservice.service.ProductPriceService;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Service;
@@ -42,6 +43,15 @@ public class ProductPriceServiceImpl implements ProductPriceService {
     @Override
     public ProductPrice findById(Long id) {
         return productPriceMapper.findById(id);
+    }
+
+    @Override
+    public ProductPrice findByProductId(Long productId) {
+        String productPriceJsonStr = redisTemplate.opsForValue().get("product_price:" + productId);
+        if (StringUtils.isNotEmpty(productPriceJsonStr)) {
+            return JSONObject.parseObject(productPriceJsonStr, ProductPrice.class);
+        }
+        return productPriceMapper.findByProductId(productId);
     }
 
 }
